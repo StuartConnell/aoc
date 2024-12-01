@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"sort"
 	"strconv"
@@ -11,10 +10,7 @@ import (
 )
 
 func read() ([]int, []int) {
-	f, err := os.Open("day1/data.txt")
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	f, _ := os.Open("day1/data.txt")
 	defer f.Close()
 
 	s := bufio.NewScanner(f)
@@ -27,16 +23,11 @@ func read() ([]int, []int) {
 	col2 := make([]int, 0)
 	for _, row := range inputs {
 		splits := strings.Split(row, " ")
-		c1, err := strconv.Atoi(splits[0])
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		c2, err := strconv.Atoi(splits[3])
-		if err != nil {
-			log.Fatal(err.Error())
-		}
 
+		c1, _ := strconv.Atoi(splits[0])
 		col1 = append(col1, c1)
+
+		c2, _ := strconv.Atoi(splits[3])
 		col2 = append(col2, c2)
 	}
 	return col1, col2
