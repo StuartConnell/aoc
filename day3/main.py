@@ -3,10 +3,13 @@ import re
 
 def get_input() -> str:
 
+    s = ""
     with open("data.txt") as f:
         lines = f.readlines()
-        return lines[0]
 
+    for l in lines:
+        s += l
+    return s
 
 def main():
     mem = get_input() 
@@ -18,10 +21,6 @@ def main():
     for i in idx:
         matches.append(mem[i.start():i.end()])
     
-    import pprint 
-
-    pprint.pprint(matches)
-
     results = []
     for m in matches:
         nums = m[4:-1]
