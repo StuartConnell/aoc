@@ -36,7 +36,7 @@ def get_inputs() -> Tuple[List[Rule], List[List[int]]]:
 
 
 def format_rules(rules: List[Rule]) -> Dict[int, List[int]]:
-    
+
     new_rules = defaultdict(list)
     for rule in rules:
         key = rule[0]
@@ -45,7 +45,27 @@ def format_rules(rules: List[Rule]) -> Dict[int, List[int]]:
 
     retval = {k: v for k, v in new_rules.items()}
     return retval
-        
+
+
+def is_valid(rules, update):
+    for num in update:
+
+        rule = rules.get(num)
+        if not rule:
+            continue
+
+        for r in rule:
+            num_index = update.index(num)
+
+            try:
+                r_index = update.index(r)
+            except ValueError:
+                continue
+
+            if num_index > r_index:
+                return False
+    return True
+
 
 def valid_updates(rules: Dict[int, List[int]], updates: List[List[int]]) -> Tuple[List[List[int]], List[List[int]]]:
     valid = []
@@ -55,14 +75,14 @@ def valid_updates(rules: Dict[int, List[int]], updates: List[List[int]]) -> Tupl
         for num in update:
             if not is_valid:
                 break
-            
+
             rule = rules.get(num)
             if not rule:
                 continue
 
             for r in rule:
                 num_index = update.index(num)
-                
+
                 try:
                     r_index = update.index(r)
                 except ValueError:
@@ -88,17 +108,34 @@ def find_middle_values(valid_values: List[List[int]]) -> List[int]:
     return middle_values
 
 
+def fuck_it(update, rules):
+    from itertools import permutations
+
+    print("Entered: fuck_it")
+    perms = permutations(update, len(update))
+
+    for perm in perms:
+        if is_valid(rules, perm):
+            return perm
+
+
 def main():
     rules, updates = get_inputs()
     formatted_rules = format_rules(rules)
-    valid, invalid = valid_updates(formatted_rules, updates)   
-    middle_values = find_middle_values(valid)
-    
+    _, invalid = valid_updates(formatted_rules, updates)
+
+    sorted = []
+    for inv in invalid:
+        sorted_inv = fuck_it(inv, formatted_rules)
+        sorted.append(sorted_inv)
+
+    middle_values = find_middle_values(sorted)
+
     total = 0
     for middle_value in middle_values:
         total += middle_value
     print(total)
 
+
 if __name__ == '__main__':
     main()
-
