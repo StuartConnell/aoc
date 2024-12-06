@@ -1,10 +1,13 @@
-from typing import Tuple, List,  Dict
+from typing import Tuple, List, Dict
+from collections import defaultdict
 
-type Rule = Dict[int, int]
+
+type Rule = List[int]
+
 
 def get_inputs() -> Tuple[List[Rule], List[List[int]]]:
 
-    with open("example.txt") as f:
+    with open("data.txt") as f:
         lines = f.readlines()
 
     stripped_lines = []
@@ -22,7 +25,7 @@ def get_inputs() -> Tuple[List[Rule], List[List[int]]]:
 
         if not rules_ended:
             splits = line.split('|')
-            rule = Rule(first=int(splits[0]), second=int(splits[1]))
+            rule: Rule = [int(splits[0]), int(splits[1])]
             rules.append(rule)
         else:
             splits = line.split(',')
@@ -32,16 +35,70 @@ def get_inputs() -> Tuple[List[Rule], List[List[int]]]:
     return rules, updates
 
 
-def valid_updates(rules: List[Rule], updates: List[List[int]]):
+def format_rules(rules: List[Rule]) -> Dict[int, List[int]]:
+    
+    new_rules = defaultdict(list)
+    for rule in rules:
+        key = rule[0]
+        if rule[1] is not None:
+            new_rules[key].append(rule[1])
 
+    retval = {k: v for k, v in new_rules.items()}
+    return retval
+        
+
+def valid_updates(rules: Dict[int, List[int]], updates: List[List[int]]) -> Tuple[List[List[int]], List[List[int]]]:
+    valid = []
+    invalid = []
     for update in updates:
+        is_valid = True
         for num in update:
+            if not is_valid:
+                break
+            
+            rule = rules.get(num)
+            if not rule:
+                continue
 
+            for r in rule:
+                num_index = update.index(num)
+                
+                try:
+                    r_index = update.index(r)
+                except ValueError:
+                    continue
+
+                if num_index > r_index:
+                    is_valid = False
+                    break
+
+        if is_valid:
+            valid.append(update)
+        else:
+            invalid.append(update)
+    return valid, invalid
+
+
+def find_middle_values(valid_values: List[List[int]]) -> List[int]:
+    middle_values = []
+
+    for values in valid_values:
+        middle_value = values[int((len(values) - 1) / 2)]
+        middle_values.append(middle_value)
+    return middle_values
 
 
 def main():
     rules, updates = get_inputs()
-
+    formatted_rules = format_rules(rules)
+    valid, invalid = valid_updates(formatted_rules, updates)   
+    middle_values = find_middle_values(valid)
+    
+    total = 0
+    for middle_value in middle_values:
+        total += middle_value
+    print(total)
 
 if __name__ == '__main__':
     main()
+
